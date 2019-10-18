@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"net/http"
+    "strings" // Qt - For path trimming
 )
 
 func commentList(commenterHex string, domain string, path string, includeUnapproved bool) ([]comment, map[string]commenter, error) {
@@ -11,6 +12,7 @@ func commentList(commenterHex string, domain string, path string, includeUnappro
 		return nil, nil, errorMissingField
 	}
 
+    // Qt - Normalize paths by removing the query string and the trailing slash
 	statement := `
 		SELECT
 			commentHex,
@@ -24,7 +26,7 @@ func commentList(commenterHex string, domain string, path string, includeUnappro
 		FROM comments
 		WHERE
 			comments.domain = $1 AND
-			comments.path = $2
+			RTRIM(REGEXP_REPLACE(comments.path, '\?.*$', ''), '/') = $2
 	`
 
 	if !includeUnapproved {
@@ -39,6 +41,8 @@ func commentList(commenterHex string, domain string, path string, includeUnappro
 
 	var rows *sql.Rows
 	var err error
+
+    path = strings.TrimRight(path, "/") // Qt - Trim trailing slash from the path
 
 	if !includeUnapproved && commenterHex != "anonymous" {
 		rows, err = db.Query(statement, domain, path, commenterHex)
