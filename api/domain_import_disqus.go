@@ -141,7 +141,8 @@ func domainImportDisqus(domain string, url string) (int, error) {
 			continue
 		}
 
-		cHex := "anonymous"
+		// cHex := "anonymous"
+        cHex := "anonymous/" + post.Author.Name
 		if !post.Author.IsAnonymous {
 			cHex = commenterHex[post.Author.Username+"@disqus.com"]
 		}

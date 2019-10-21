@@ -143,7 +143,7 @@
     if (attr === undefined) {
       return undefined;
     }
-    
+
     return attr.value;
   }
 
@@ -658,7 +658,7 @@
       if (message !== "") {
         prepend($(ID_SUPER_CONTAINER + id), messageCreate(message));
       }
-      
+
       var commenterHex = selfHex;
       if (commenterHex === undefined || commenterToken === "anonymous") {
         commenterHex = "anonymous";
@@ -804,7 +804,9 @@
       var sticky = create("button");
       var children = commentsRecurse(parentMap, comment.commentHex);
       var contents = create("div");
-      var color = colorGet(comment.commenterHex + "-" + commenter.name);
+      // < Qt - Get same color for each Disqus-imported anon user
+      var color = colorGet(comment.commenterHex.startsWith("anonymous/") ? "anonymous-Anonymous" : comment.commenterHex + "-" + commenter.name);
+      // Qt >
       var name;
       if (commenter.link !== "undefined" && commenter.link !== "https://undefined" && commenter.link !== "") {
         name = create("a");
@@ -861,7 +863,7 @@
         avatar = create("div");
         avatar.style["background"] = color;
 
-        if (comment.commenterHex === "anonymous") {
+        if (comment.commenterHex === "anonymous" || comment.commenterHex.startsWith("anonymous/")) { // Qt - Include also Disqus-imported anons
           avatar.innerHTML = "?";
           avatar.style["font-weight"] = "bold";
         } else {
@@ -967,7 +969,7 @@
       if (isModerator && comment.state !== "approved") {
         append(options, approve);
       }
-      
+
       if (!isModerator && stickyCommentHex === comment.commentHex) {
         append(options, sticky);
       }
@@ -1682,7 +1684,7 @@
   global.passwordAsk = function(id) {
     var loginBox = $(ID_LOGIN_BOX);
     var subtitle = $(ID_LOGIN_BOX_EMAIL_SUBTITLE);
-    
+
     remove($(ID_LOGIN_BOX_EMAIL_BUTTON));
     remove($(ID_LOGIN_BOX_LOGIN_LINK_CONTAINER));
     remove($(ID_LOGIN_BOX_FORGOT_LINK_CONTAINER));
@@ -1904,7 +1906,7 @@
     global.popupRender(id);
 
     classAdd(mainArea, "blurred");
-    
+
     attrSet(loginBoxContainer, "style", "");
 
     window.location.hash = ID_LOGIN_BOX_CONTAINER;

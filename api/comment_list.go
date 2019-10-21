@@ -98,6 +98,19 @@ func commentList(commenterHex string, domain string, path string, includeUnappro
 
 		comments = append(comments, c)
 
+        // < Qt - Hack to get the name from the anonymous Disqus imported
+        //        comments where the hex is stored as anonymous/John Doe
+        if strings.HasPrefix(c.CommenterHex, "anonymous/") {
+            obj := commenters["anonymous"]
+            parts := strings.Split(c.CommenterHex, "/")
+
+            obj.Name = parts[1]
+            obj.CommenterHex = c.CommenterHex
+
+            commenters[c.CommenterHex] = obj
+        }
+        // Qt >
+
 		if _, ok := commenters[c.CommenterHex]; !ok {
 			commenters[c.CommenterHex], err = commenterGetByHex(c.CommenterHex)
 			if err != nil {
